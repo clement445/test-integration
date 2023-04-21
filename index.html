@@ -1,0 +1,178 @@
+<!-- Crédit : Grafikart https://grafikart.fr/ -->
+
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test d'intégration</title>
+    <style>
+        :root {
+            --image-maquette: url();
+            --image-dev: url();
+        }
+
+        html,
+        body {
+            font-size: 18px;
+            color: white;
+            background: hsl(235 19% 13%);
+            padding-top: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .canvas-container {
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 400px);
+            justify-content: center;
+            gap: 40px 20px;
+            font-family: sans-serif;
+        }
+
+        #main::after {
+            display: none;
+        }
+
+        .canvas {
+            width: 400px;
+            height: 300px;
+            position: relative;
+        }
+
+        .canvas::before {
+            position: absolute;
+            top: -1.4rem;
+            left: 0;
+        }
+
+        #main::before {
+            content: 'Rendu';
+        }
+
+        .ref::before {
+            content: 'Référence';
+        }
+
+        .diff::before {
+            content: 'Différence';
+        }
+
+        .overlay::before {
+            content: 'Superposition';
+        }
+
+        .demo__image {
+            width: 400px;
+        }
+
+        .canvas::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: var(--image-dev);
+            width: 400px;
+            background-color: red;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .rendu-maquette::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: var(--image-maquette);
+            background-color: red;
+            width: 400px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .overlay::after {
+            opacity: .2;
+        }
+
+        .diff::after {
+            mix-blend-mode: difference;
+        }
+
+    </style>
+</head>
+
+<body>
+    <form action="">
+        <label for="maquette">
+            Image maquette
+            <input type="file" name="maquette" id="maquette" accept="image/*">
+        </label>
+        <label for="dev">
+            Image intégration
+            <input type="file" name="dev" id="dev" accept="image/*">
+        </label>
+    </form>
+    <div class="canvas-container">
+        <div class="canvas" id="main">
+
+
+
+            <div class="rendu-maquette">
+                <img id="imgMaquette" src="" alt="">
+            </div>
+
+        </div>
+
+        <div class="canvas ref"></div>
+        <div class="canvas diff"></div>
+        <div class="canvas overlay"></div>
+    </div>
+    <script>
+        const sourceHTML = document.querySelector('#main').innerHTML
+
+        document.querySelectorAll('.canvas').forEach(c => {
+            c.innerHTML = sourceHTML
+        })
+
+        var r = document.querySelector(':root');
+        const inputImgDev = document.getElementById('dev')
+        const inputImgMaquette = document.getElementById('maquette')
+        const imgDev = document.getElementById('img')
+        const imgMaquette = document.getElementById('img')
+
+        function getImg(event, type) {
+
+            const file = event.target.files[0];
+
+            let url = window.URL.createObjectURL(file);
+
+            console.log(url.split("blob:")[1])
+            url = url
+            switch (type) {
+                case 'dev':
+                    r.style.setProperty('--image-dev', `url(${url})`);
+                    break;
+                case 'maquette':
+                    r.style.setProperty('--image-maquette', `url(${url})`);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+        inputImgDev.addEventListener('change', e => getImg(e, "dev"))
+        inputImgMaquette?.addEventListener('change', e => getImg(e, "maquette"))
+    </script>
+</body>
+
+</html>
